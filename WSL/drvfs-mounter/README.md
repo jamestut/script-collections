@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿## drvfs Mounter Script
+## drvfs Mounter Script
 
 This simple script can be used to automatically mount Windows volumes to a specified mountpoint inside WSL everytime a WSL instance is started. The list of volumes is specified in a file.
 
@@ -39,7 +39,8 @@ Both `<target_WSL_mountpoint>` and `<windows_mountpoint>` may not contain spaces
 
 ### How It Works
 
-This script will call:
-`mount -t drvfs <windows_mountpoint> <target_WSL_mountpoint>`
+This script will call:  
+
+`mount -t drvfs <windows_mountpoint> <target_WSL_mountpoint>`  
 
 should the target WSL mountpoint is not already used for mounting other devices. This script will automatically create the directory if not exists, but it does not check for permission clash or non-empty directory (the `mount` program should print the appropriate error message should an error happen).
