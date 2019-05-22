@@ -58,8 +58,11 @@ case "$1" in
 		echo `date`: 'load iptables rule'
 		# tokenize line by line
 		IFS=$'\n'
-		for RULE in `cat "$2"`
+		# this grep rule will strip out empty/space only lines
+		for RULE in `grep -v -e '^[[:space:]]*$' "$2"`
 		do
+			# skip comment lines
+			if [[ ${RULE:0:1} == "#" ]]; then continue; fi
 			# non standard IFS interferes with shell execution
 			unset IFS
 			IFS=, read -r -a COMP <<< "$RULE"
@@ -86,8 +89,9 @@ case "$1" in
 		echo `date`: 'unload iptables rule'
 		# tokenize line by line
 		IFS=$'\n'
-		for RULE in `cat "$2"`
+		for RULE in `grep -v -e '^[[:space:]]*$' "$2"`
 		do
+			if [[ ${RULE:0:1} == "#" ]]; then continue; fi
 			# non standard IFS interferes with shell execution
 			unset IFS
 			IFS=, read -r -a COMP <<< "$RULE"

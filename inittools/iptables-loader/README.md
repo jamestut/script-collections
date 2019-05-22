@@ -27,3 +27,5 @@ All fields are mandatory.
 - `insert_mode` can be either `A` or `I`. `A` appends the given rule to the end of the given table/chain combination, whereas `I` prepends the given rule to the beginning of the given table/chain combination. Insertion in the middle of the chain is not supported.
 - `chain` is the iptables chain for the given `table_name` (e.g. `POSTROUTING` and `PREROUTING` for the `nat` table). This can vary considerably depending on the choosen table, kernel version, kernel module, etc.
 - `iptables_rule` is the rule that is to be added. This rule will be directly passed to the system's `iptables` utility.
+
+Comment lines must begin with `#`, and may not be prepended by any blank lines. Inline comments are not supported.
