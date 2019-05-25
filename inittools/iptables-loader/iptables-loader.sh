@@ -29,13 +29,6 @@ then
 	exit 1
 fi
 
-cleanup () {
-	sleep 5
-	echo clean >> /log.txt
-}
-
-trap cleanup SIGINT SIGTERM
-
 case "$1" in
 	load)
 		# does we have unload file set for writing?
