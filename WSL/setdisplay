@@ -1,0 +1,3 @@
+#!/bin/bash
+ROUTEINFO=( `route -n | head -3 | tail -1` )
+export DISPLAY=${ROUTEINFO[1]}:0
