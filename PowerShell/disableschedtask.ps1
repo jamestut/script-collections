@@ -1,12 +1,11 @@
-# fill this variable with path. To recursively list all tasks in a path, use the 
-# "\Path\To\SchTask\" (e.g. ends with backslash).
-# Otherwise, the last component of the name will be regarded as the task name.
-$paths = @()
+if($args.Length -ne 1) {
+    throw "This script requires file name."
+}
 
 # populated by script
 $tasks = @()
 
-$paths | ForEach-Object {
+Get-Content -Path $args[0] | ForEach-Object {
     if(!$_.StartsWith("\")) {
         throw "Invalid path specification."
     }
