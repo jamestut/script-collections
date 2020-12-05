@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script>
+// use html color names for bg (including #xxxxxx or "red", "green", "blue", etc)
+function gen(tx,ty,bg=null) {
+    var img = document.querySelector("img");
+    var canvas = document.createElement("canvas");
+    canvas.width=tx;
+    canvas.height=ty;
+    
+    sx = img.width;
+    sy = img.height;
+    
+    // d(x/y) = dest pos, ss(x/y) = dest size
+    
+    // compute position and size
+    if((sx/sy) > (tx/ty)) {
+        // image is wider than target
+        ssx = tx;
+        ssy = sy * (tx/sx);
+        dx = 0;
+        dy = (ty-ssy)/2;
+    } else {
+        // image is square/taller than target
+        ssy = ty;
+        ssx = sx * (ty/sy);
+        dy = 0;
+        dx = (tx-ssx)/2;
+    }
+    
+    var context = canvas.getContext("2d");
+    if(bg != null || bg == "") {
+        context.fillStyle = bg;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    context.drawImage(img, dx, dy, ssx, ssy);
+    
+    var a = document.createElement("a");
+    a.download = "image.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+}
+
+</script>
+<body>
+<img src="image.svg"/><br>
+<button onclick="gen(prompt('width'),prompt('height'),prompt('background (HTML color)'))">Generate</button><br>
+<div id="targetlink"></div>
+</body>
