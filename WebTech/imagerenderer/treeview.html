@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+    async function openFile() {
+      let fh = null;
+      try {
+        fh = await showOpenFilePicker({ multiple: false });
+      } catch (err) {
+        return;
+      }
+      let file = await fh[0].getFile();
+      let data = await file.text();
+      const lines = data.split("\n");
+      let dict = {};
+      for (let i = 0; i < lines.length; ++i) {
+        const line = lines[i].trim();
+        if (line.length == 0) continue;
+        const splt = line.split("/");
+
+        let prevDict = null;
+        let prevDictData = dict;
+        for (let j = 0; j < splt.length; ++j) {
+          if (splt[j].length == 0) {
+            // previous term is a directory
+            if (prevDict != null && prevDict.data === undefined)
+              prevDict.data = {};
+            break;
+          } else {
+            if (prevDictData == null) {
+              prevDictData = prevDict.data = {};
+            }
+            if (!(splt[j] in prevDictData)) {
+              let pathComp = splt.slice(0, j + 1);
+              prevDictData[splt[j]] = prevDict = { path: pathComp.join("/") };
+              prevDictData = null;
+            } else {
+              prevDict = prevDictData[splt[j]];
+              prevDictData = prevDict.data === undefined ? null : prevDict.data;
+            }
+          }
+        }
+      }
+      window.data = dict;
+      // render root only
+      collapseAll();
+    }
+
+    function render(cont, data, recurse) {
+      cont.innerHTML = "";
+      for (const [key, value] of Object.entries(data)) {
+        let dataCol = document.createElement("td");
+        dataCol.innerText = key;
+
+        let expButton = document.createElement("button");
+        expButton.innerText = recurse ? "-" : "+";
+        if ("data" in value) {
+          expButton.addEventListener("click", function () {
+            if (expButton.innerText == "+") {
+              // expand
+              let nestedList = document.createElement("ul");
+              dataCol.appendChild(nestedList);
+              render(nestedList, value.data, false);
+              expButton.innerText = "-";
+            } else {
+              // contract
+              let nestedLists = dataCol.getElementsByTagName("ul");
+              for (let i = 0; i < nestedLists.length; ++i) {
+                nestedLists[i].remove();
+              }
+              expButton.innerText = "+";
+            }
+          });
+          if (recurse) {
+            let nestedList = document.createElement("ul");
+            dataCol.appendChild(nestedList);
+            render(nestedList, value.data, true);
+          }
+        } else {
+          expButton.innerText = "F";
+          expButton.disabled = true;
+        }
+        let copyButton = document.createElement("button");
+        copyButton.innerText = "C";
+        copyButton.addEventListener("click", function () {
+          let fileNameTxt = document.getElementById("filename");
+          fileNameTxt.value = value["path"] + (("data" in value) ? "/" : "");
+          fileNameTxt.select();
+          document.execCommand("copy");
+        })
+
+        // layout
+        let cmdCol = document.createElement("td");
+        cmdCol.className = "cmdcol";
+        cmdCol.appendChild(expButton);
+        cmdCol.appendChild(copyButton);
+        let tr = document.createElement("tr");
+        tr.appendChild(cmdCol);
+        tr.appendChild(dataCol);
+        let table = document.createElement("table");
+        table.appendChild(tr);
+        let item = document.createElement("li");
+        item.appendChild(table);
+
+        cont.appendChild(item);
+      }
+    }
+
+    function collapseAll() {
+      render(document.getElementById("root"), window.data, false);
+    }
+
+    function expandAll() {
+      render(document.getElementById("root"), window.data, true);
+    }
+  </script>
+  <style>
+    ul {
+      list-style: none;
+    }
+
+    li button {
+      width: 16px;
+      padding: 0;
+      margin-left: 2px;
+      margin-right: 2px;
+    }
+
+    .cmdcol {
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    ul {
+      padding: 0;
+    }
+
+    #path-cont {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="path-cont">
+    <input id="filename" style="width: 100%;" />
+  </div>
+  <div style="margin-top: 2em;">
+    <button onclick="openFile()">Open</button>
+    <button onclick="expandAll()">Expand All</button>
+    <button onclick="collapseAll()">Collapse All</button>
+  </div>
+  <ul id="root">
+  </ul>
+</body>
+
+</html>
