@@ -3,7 +3,7 @@
 <script>
 // use html color names for bg (including #xxxxxx or "red", "green", "blue", etc)
 function gen(tx,ty,bg=null) {
-    var img = document.querySelector("img");
+    var img = document.querySelector("#myimg");
     var canvas = document.createElement("canvas");
     canvas.width=tx;
     canvas.height=ty;
@@ -41,9 +41,34 @@ function gen(tx,ty,bg=null) {
     a.click();
 }
 
+async function openImage() {
+	try {
+      [fileHandle] = await window.showOpenFilePicker({
+        multiple: false,
+        types: [
+          {
+            description: 'Images',
+            accept: {
+              'image/*': ['.png', '.gif', '.jpeg', '.jpg', '.webp', '.heif', '.heic', '.svg']
+            }
+          },
+        ]
+      });
+    } catch {
+      alert("File selection cancelled.");
+      return;
+    }
+	
+	const data = await fileHandle.getFile();
+	
+	const imgEl = document.querySelector("#myimg");
+	imgEl.src = URL.createObjectURL(data);
+}
+
 </script>
 <body>
-<img src="image.svg"/><br>
+<img id="myimg"/><br>
+<button onclick="openImage()">Open Image</button><br>
 <button onclick="gen(prompt('width'),prompt('height'),prompt('background (HTML color)'))">Generate</button><br>
 <div id="targetlink"></div>
 </body>
