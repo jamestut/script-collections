@@ -8,6 +8,7 @@ function gen(tx,ty,bg=null) {
     canvas.width=tx;
     canvas.height=ty;
     
+	document.defaultBg = bg;
     sx = img.width;
     sy = img.height;
     
@@ -64,11 +65,16 @@ async function openImage() {
 	const imgEl = document.querySelector("#myimg");
 	imgEl.src = URL.createObjectURL(data);
 }
-
 </script>
+<style>
+	#myimg {
+		max-width: 400px;
+		max-height: 400px;
+	}
+</style>
 <body>
 <img id="myimg"/><br>
 <button onclick="openImage()">Open Image</button><br>
-<button onclick="gen(prompt('width'),prompt('height'),prompt('background (HTML color)'))">Generate</button><br>
+<button onclick="gen(prompt('width'),prompt('height'),prompt('background (HTML color)', document.defaultBg))">Generate</button><br>
 <div id="targetlink"></div>
 </body>
