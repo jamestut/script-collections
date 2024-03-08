@@ -50,18 +50,22 @@ def edit_container_config(conn: sqlite3.Connection, cur: sqlite3.Cursor, name_or
         return 1
 
     print(f'Editing configuration for container with {col_to_match}: {name_or_id}')
+    old_data = rs[0][0]
     with tempfile.NamedTemporaryFile('+wb', suffix='.json') as f:
-        f.write(rs[0][0])
+        f.write(old_data)
         subprocess.run([os.environ.get('EDITOR', 'nano'), f.name])
         # read back
         print('Saving configuration ...')
         f.seek(0)
         new_data = f.read()
 
-    cur.execute(f'update ContainerConfig set JSON=? where {col_to_match}=?', (new_data, name_or_id))
-    conn.commit()
-    conn.close()
-    print("Done!")
+    if new_data != old_data:
+        cur.execute(f'update ContainerConfig set JSON=? where {col_to_match}=?', (new_data, name_or_id))
+        conn.commit()
+        conn.close()
+        print("Done!")
+    else:
+        print("No changes detected.")
 
 if __name__ == '__main__':
     sys.exit(main())
