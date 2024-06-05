@@ -53,7 +53,9 @@ def edit_container_config(conn: sqlite3.Connection, cur: sqlite3.Cursor, name_or
     old_data = rs[0][0]
     with tempfile.NamedTemporaryFile('+wb', suffix='.json') as f:
         f.write(old_data)
-        subprocess.run([os.environ.get('EDITOR', 'nano'), f.name])
+        editorargs = os.environ.get('EDITOR', 'nano').split()
+        editorargs.append(f.name)
+        subprocess.run(editorargs)
         # read back
         print('Saving configuration ...')
         f.seek(0)
